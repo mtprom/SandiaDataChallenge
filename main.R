@@ -1,5 +1,7 @@
 setwd("/Users/bezaitis/Desktop/school/FA_25/Sandia Data Challenge/")
 library(ggplot2)
+library(patchwork)
+
 
 
 all_data_recycled <- read.csv('AllData_PreEDM_Recycled_RowColIDs.csv')
@@ -64,18 +66,61 @@ ratio6x6TA <- total_6x6TA_scrap/total_6x6TA
 
 total_11x11TA <- sum(all_data$Layout == '11X11TA')
 total_11x11TA_scrap <- sum(all_data$Layout == '11X11TA' & all_data$is_scrap == 'TRUE')
-ratio11x11 <- total_11x11_scrap/total_11x11
+ratio11x11TA <- total_11x11TA_scrap/total_11x11TA
 
-names(ratios) <- c("ratio6x6","ratio6x6TA","ratio11x11")
-layout_scrap <- barplot(ratios, 
+layout_scrap_ratios <- c(ratio6x6,ratio6x6TA,ratio11x11TA)
+
+names(layout_scrap_ratios) <- c("ratio6x6","ratio6x6TA","ratio11x11TA")
+chart_layout_scrap <- barplot(layout_scrap_ratios, 
                         main = 'Scrap % by plate layout', 
                         xlab = 'Layout', 
                         ylab = '% scrap', 
                         col = c('steelblue', 'white', 'purple'))
 
+total_layout_count <- c(total_6x6TA,total_11x11TA,total_6x6)
+names(total_layout_count) <- c("6x6TA","11x11TA", "6x6")
+chart_pie <- pie(total_layout_count, main = "CUPs produced by layout")
 
 
+assign_week <- function(dat) {
+  # define groups
+  week1 <- c("A", "B", "C", "D", "E")
+  week2 <- c("F", "G", "H", "I", "J")
+  week4v <- c("K")
+  week4r <- c("L", "M")
+  week5r <- c("N", "O", "P", "Q", "R")
+  
+  # start a new column
+  dat$week <- NA
+  
+  # match against Layout
+  dat$week[dat$PlateID %in% week1]  <- 1
+  dat$week[dat$PlateID %in% week2]  <- 2
+  dat$week[dat$PlateID %in% week4v] <- 4  # or 41 if you want to separate
+  dat$week[dat$PlateID %in% week4r] <- 4  # same week, different subtype
+  dat$week[dat$PlateID %in% week5r] <- 5
+  
+  dat
+}
 
+all_data <- assign_week(all_data)
+
+plots <- lapply(names(specs), function(var) {
+  range_vals <- specs[[var]]
+  
+  ggplot(all_data, aes_string(x = var, y = "week", color = "Layout")) +
+    geom_point(size = 2.5) +
+    geom_vline(xintercept = range_vals, linetype = "dashed", color = "black") +
+    labs(
+      title = paste(var, "vs Week"),
+      x = var,
+      y = "Week",
+      color = "Layout"
+    ) +
+    theme_minimal()
+})
+names(plots) <- names(specs)
+wrap_plots(plots, ncol = 2)
 
 
 
