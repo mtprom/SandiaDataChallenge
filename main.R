@@ -26,7 +26,6 @@ renamed <- list('LID', # Lip interior diameter
 
 colnames(all_data)[2:9] <- renamed
 
-
 specs <- list(
   LID = c(0.415, 0.435),      # Lip interior diameter
   LED = c(0.445, 0.469),            # Lip exterior diameter  
@@ -52,8 +51,15 @@ for (param in names(specs)) {
 
 spec_columns <- paste0(names(specs), "_in_spec")
 all_data$overall_in_spec <- apply(all_data[, spec_columns], 1, all)
+all_data$overall_in_spec[all_data$Nonconformity == TRUE] <- FALSE
 
-all_data$is_scrap <- !all_data$overall_in_spec
+
+all_data$is_scrap <- !all_data$overall_in_spec 
+
+
+
+
+
 
 recycled_total <- sum(all_data$Powder == 'Recycled')
 recycled_total_scrap <- sum(all_data$Powder == 'Recycled' & all_data$is_scrap == 'TRUE')
@@ -146,6 +152,5 @@ summary(model)
 
 colnames(all_data)
 
-test
-
 sapply(all_data[, grep("_in_spec", names(all_data))], function(x) table(all_data$is_scrap, x))
+
