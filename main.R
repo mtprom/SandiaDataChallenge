@@ -146,5 +146,6 @@ summary(model)
 
 colnames(all_data)
 
+test
 
 sapply(all_data[, grep("_in_spec", names(all_data))], function(x) table(all_data$is_scrap, x))
