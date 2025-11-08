@@ -55,6 +55,22 @@ all_data$overall_in_spec <- apply(all_data[, spec_columns], 1, all)
 
 all_data$is_scrap <- !all_data$overall_in_spec
 
+recycled_total <- sum(all_data$Powder == 'Recycled')
+recycled_total_scrap <- sum(all_data$Powder == 'Recycled' & all_data$is_scrap == 'TRUE')
+ratio_recycled <- recycled_total_scrap / recycled_total
+
+virgin_total <- sum(all_data$Powder == 'Virgin')
+virgin_total_scrap <- sum(all_data$Powder == 'Virgin' & all_data$is_scrap == 'TRUE')
+ratio_virgin <- virgin_total_scrap / virgin_total
+
+powder_scrap_ratios <- c(ratio_recycled, ratio_virgin)
+names(powder_scrap_ratios) <- c("Recycled", "Virgin")
+
+powder_scrap_ratios <- barplot(powder_scrap_ratios, 
+                        main = 'Scrap % by powder', 
+                        xlab = 'Powder Type', 
+                        ylab = '% scrap', 
+                        col = c('steelblue', 'white'))
 
 total_6x6 <- sum(all_data$Layout == '6X6')
 total_6x6_scrap <- sum(all_data$Layout == '6X6' & all_data$is_scrap == 'TRUE')
@@ -123,8 +139,12 @@ names(plots) <- names(specs)
 wrap_plots(plots, ncol = 2)
 
 
+model <- glm(is_scrap ~ factor(Layout) + Powder + Nonconformity,
+             data = all_data,
+             family = binomial)
+summary(model)
+
+colnames(all_data)
 
 
-
-
-
+sapply(all_data[, grep("_in_spec", names(all_data))], function(x) table(all_data$is_scrap, x))
