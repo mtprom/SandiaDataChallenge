@@ -62,8 +62,8 @@ total_6x6TA <- sum(all_data$Layout == '6X6TA')
 total_6x6TA_scrap <- sum(all_data$Layout == '6X6TA' & all_data$is_scrap == 'TRUE')
 ratio6x6TA <- total_6x6TA_scrap/total_6x6TA
 
-total_11x11 <- sum(all_data$Layout == '11X11TA')
-total_11x11_scrap <- sum(all_data$Layout == '11X11TA' & all_data$is_scrap == 'TRUE')
+total_11x11TA <- sum(all_data$Layout == '11X11TA')
+total_11x11TA_scrap <- sum(all_data$Layout == '11X11TA' & all_data$is_scrap == 'TRUE')
 ratio11x11 <- total_11x11_scrap/total_11x11
 
 names(ratios) <- c("ratio6x6","ratio6x6TA","ratio11x11")
